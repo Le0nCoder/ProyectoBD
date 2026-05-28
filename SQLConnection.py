@@ -1,4 +1,3 @@
-Python
 from bs4 import BeautifulSoup
 import spacy
 import re
@@ -8,8 +7,6 @@ import json
 import random
 import requests
 import undetected_chromedriver as uc
-import mysql.connector
-from mysql.connector import Error
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -18,58 +15,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # =====================================================================
-# CONFIGURACIÓN GENERAL, LLM Y BASE DE DATOS
+# CONFIGURACIÓN GENERAL Y LLM
 # =====================================================================
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "qwen2.5:7b"
 NA = None
 CHECKPOINT_CADA = 20
-ARCHIVO_SALIDA = "dataset_delitos_v3.json"
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'Sistema_Delitos'
-}
-
-# =====================================================================
-# LÓGICA DE PERSISTENCIA (AÑADIDA)
-# =====================================================================
-def guardar_en_bd(data):
-    """Persistencia según SQL_eventos_3.txt y SQL_delitos.txt"""
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor()
-        
-        # 1. Insertar Noticia
-        cursor.execute("INSERT INTO Noticia (titulo, url, fecha) VALUES (%s, %s, %s)", 
-                       (data['noticia']['titulo'], data['noticia']['url'], datetime.now()))
-        id_noticia = cursor.lastrowid
-        
-        # 2. Insertar Ubicación
-        cursor.execute("INSERT INTO Ubicacion (municipio, estado, detalle) VALUES (%s, %s, %s)",
-                       (data.get('municipio'), data.get('estado'), data.get('detalle', '')))
-        id_ubi = cursor.lastrowid
-        
-        # 3. Insertar Vehículo
-        cursor.execute("INSERT INTO Vehiculo (tipo, modelo) VALUES (%s, %s)",
-                       (data.get('vehiculo_tipo', 'N/A'), data.get('vehiculo_modelo', 'N/A')))
-        id_veh = cursor.lastrowid
-        
-        # 4. Insertar Evento (relacionado)
-        cursor.execute("INSERT INTO Evento (id_tipo_evento, id_Ubicacion, id_vehiculo) VALUES (%s, %s, %s)",
-                       (data.get('id_tipo_evento', 1), id_ubi, id_veh))
-        id_evento = cursor.lastrowid
-        
-        # 5. Insertar Afectación
-        cursor.execute("INSERT INTO Afectacion_economica (id_evento, cantidad) VALUES (%s, %s)",
-                       (id_evento, data.get('dinero', 0)))
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
-    except Error as e:
-        print(f"Error crítico en BD: {e}")
+ARCHIVO_SALIDA = "dataset_delitos_v3.json"  
 
 # =====================================================================
 # FUNCIONES DE EXTRACCIÓN WEB (SELENIUM + BEAUTIFULSOUP)
@@ -395,12 +347,19 @@ if os.path.exists("links_final.pkl"):
         links = pickle.load(f)
     print(f"Archivo 'links_final.pkl' cargado con éxito. Se procesarán {len(links)} enlaces.")
 else:
-    print("No se encontró 'links_final.pkl'. Usando enlaces de prueba por defecto...")
+    print("No se encontró 'links_final.pkl'. Usando enlaces de prueba...")
     links = [
         "https://www.diariocambio.com.mx/2026/policiaca/no-aprenden-otra-vez-clausuran-el-bar-tulum-a-dias-de-reabrir-en-cu",
-        "https://www.diariocambio.com.mx/2026/policiaca/misterio-en-tlahuapan-hallan-auto-abandonado-y-a-tres-personas-maniatadas-sobre-la-mexico-puebla"
+        "https://www.diariocambio.com.mx/2026/policiaca/misterio-en-tlahuapan-hallan-auto-abandonado-y-a-tres-personas-maniatadas-sobre-la-mexico-puebla",
+        "https://www.diariocambio.com.mx/2026/policiaca/ejecutan-a-motociclista-en-la-unidad-habitacional-la-margarita",
+        "https://www.diariocambio.com.mx/2026/policiaca/asalto-a-cuentahabiente-en-plaza-angelopolis-se-llevan-mas-de-500-mil-pesos",
+        "https://www.diariocambio.com.mx/2026/policiaca/choque-multiple-en-el-periferico-ecologico-deja-dos-lesionados",
+        "https://www.diariocambio.com.mx/2026/policiaca/detienen-a-banda-de-robacoches-que-operaba-en-la-zona-de-valle-de-angeles",
+        "https://www.diariocambio.com.mx/2026/policiaca/hallan-restos-humanos-en-bolsas-negras-en-la-carretera-federal-a-tehuacan",
+        "https://www.diariocambio.com.mx/2026/policiaca/balacera-en-san-andres-cholula-reportan-un-fallecido",
+        "https://www.diariocambio.com.mx/2026/policiaca/incendio-en-bodega-de-reciclaje-alerta-a-vecinos-de-la-zona-industrial",
+        "https://www.diariocambio.com.mx/2026/policiaca/mujer-es-victima-de-secuestro-virtual-en-el-centro-historico"
     ]
-
 driver = crear_driver()
 resultados = []
 
