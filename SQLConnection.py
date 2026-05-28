@@ -347,19 +347,12 @@ if os.path.exists("links_final.pkl"):
         links = pickle.load(f)
     print(f"Archivo 'links_final.pkl' cargado con éxito. Se procesarán {len(links)} enlaces.")
 else:
-    print("No se encontró 'links_final.pkl'. Usando enlaces de prueba...")
+    print("No se encontró 'links_final.pkl'. Usando enlaces de prueba por defecto...")
     links = [
         "https://www.diariocambio.com.mx/2026/policiaca/no-aprenden-otra-vez-clausuran-el-bar-tulum-a-dias-de-reabrir-en-cu",
-        "https://www.diariocambio.com.mx/2026/policiaca/misterio-en-tlahuapan-hallan-auto-abandonado-y-a-tres-personas-maniatadas-sobre-la-mexico-puebla",
-        "https://www.diariocambio.com.mx/2026/policiaca/ejecutan-a-motociclista-en-la-unidad-habitacional-la-margarita",
-        "https://www.diariocambio.com.mx/2026/policiaca/asalto-a-cuentahabiente-en-plaza-angelopolis-se-llevan-mas-de-500-mil-pesos",
-        "https://www.diariocambio.com.mx/2026/policiaca/choque-multiple-en-el-periferico-ecologico-deja-dos-lesionados",
-        "https://www.diariocambio.com.mx/2026/policiaca/detienen-a-banda-de-robacoches-que-operaba-en-la-zona-de-valle-de-angeles",
-        "https://www.diariocambio.com.mx/2026/policiaca/hallan-restos-humanos-en-bolsas-negras-en-la-carretera-federal-a-tehuacan",
-        "https://www.diariocambio.com.mx/2026/policiaca/balacera-en-san-andres-cholula-reportan-un-fallecido",
-        "https://www.diariocambio.com.mx/2026/policiaca/incendio-en-bodega-de-reciclaje-alerta-a-vecinos-de-la-zona-industrial",
-        "https://www.diariocambio.com.mx/2026/policiaca/mujer-es-victima-de-secuestro-virtual-en-el-centro-historico"
+        "https://www.diariocambio.com.mx/2026/policiaca/misterio-en-tlahuapan-hallan-auto-abandonado-y-a-tres-personas-maniatadas-sobre-la-mexico-puebla"
     ]
+
 driver = crear_driver()
 resultados = []
 
